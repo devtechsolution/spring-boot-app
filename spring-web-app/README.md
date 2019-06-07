@@ -1,18 +1,64 @@
-
 ## What You Will Learn during this Step:
-- You first GET Parameter.
-- Problem with using GET
+- Add validation for userid and password
+ - Hard coded validation!!
 
-## Snippets
+## Useful Snippets and References
+First Snippet
 ```
-ModelMap model
-model.put("name", name);
-My First JSP!!! My name is ${name}
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public String showLoginPage(ModelMap model, @RequestParam String name) {
+        return "login";
+    }
+
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public String handleLogin(ModelMap model, @RequestParam String name) {
+        model.put("name", name);
+        return "welcome";
+    }
+
+```
+Second Snippet
+```
+<form method="POST">
+        Name : <input name="name" type="text" /> <input type="submit" />
+</form>
+
 ```
 
-## Exercises
-- Create a new jsp and a new controller method to redirect to it!
-- Play around!
+Third Snippet
+```
+package org.dev.tech.service;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class LoginService {
+    public boolean validateUser(String user, String password) {
+        return user.equalsIgnoreCase("aditya") && password.equals("srivastva");
+    }
+}
+
+```
+Fourth Snippet
+```
+    @Autowired
+    private LoginService service;
+
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public String handleLogin(ModelMap model, @RequestParam String name,
+            @RequestParam String password) {
+
+        boolean isValidUser = service.validateUser(name, password);
+
+        if (isValidUser) {
+            model.put("name", name);
+            return "welcome";
+        } else {
+            model.put("errorMessage", "Invalid Credentials!!");
+            return "login";
+        }
+    }
+```
 
 ## Files List
 
@@ -50,16 +96,19 @@ My First JSP!!! My name is ${name}
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		
+		<dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <scope>provided</scope>
+        </dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-jasper</artifactId>
-            <scope>provided</scope>
-        </dependency>		
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -84,17 +133,60 @@ My First JSP!!! My name is ${name}
 ```java
 package org.dev.tech.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import org.dev.tech.service.LoginService;
 
 @Controller
 public class LoginController {
 	
-	@RequestMapping("/login")
-	public String loginMessage(){
+	@Autowired
+	LoginService service;
+	
+	@RequestMapping(value="/login", method = RequestMethod.GET)
+	public String showLoginPage(ModelMap model){
 		return "login";
 	}
+	
+	@RequestMapping(value="/login", method = RequestMethod.POST)
+	public String showWelcomePage(ModelMap model, @RequestParam String name, @RequestParam String password){
+		boolean isValidUser = service.validateUser(name, password);
+		
+		if (!isValidUser) {
+			model.put("errorMessage", "Invalid Credentials");
+			return "login";
+		}
+		
+		model.put("name", name);
+		model.put("password", password);
+		
+		return "welcome";
+	}
+
+}
+```
+---
+### src/main/java/org/dev/tech/service/LoginService.java
+
+```java
+package org.dev.tech.service;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class LoginService {
+
+	public boolean validateUser(String userid, String password) {
+		// aditya, srivastva
+		return userid.equalsIgnoreCase("aditya")
+				&& password.equalsIgnoreCase("srivastva");
+	}
+
 }
 ```
 ---
@@ -133,7 +225,28 @@ logging.level.org.springframework.web=DEBUG
 </head>
 
 <body>
-My First JSP!!
+	<font color="red">${errorMessage}</font>
+	<form method="post">
+		Name : <input type="text" name="name" />
+		Password : <input type="password" name="password" /> 
+		<input type="submit" />
+	</form>
+</body>
+
+</html>
+```
+---
+### src/main/webapp/WEB-INF/jsp/welcome.jsp
+
+```
+<html>
+
+<head>
+<title>First Web Application</title>
+</head>
+
+<body>
+	Welcome ${name}!!
 </body>
 
 </html>
@@ -163,6 +276,11 @@ public class SpringBootFirstWebApplicationTests {
 ### todo.txt
 
 ```
+Component, Service, Repository, Controller
+Autowired
+ComponentScan
+
+
 Spring Boot Starter Parent
 Spring Boot Starter Web
 @SpringBootApplication
