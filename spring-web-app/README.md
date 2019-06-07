@@ -1,36 +1,13 @@
+
 ## What You Will Learn during this Step:
-- Your First JSP
- - There is a bit of setup before we get there!
-- Introduction to View Resolver
+- You first GET Parameter.
+- Problem with using GET
 
-## Useful Snippets and References
-First Snippet - /src/main/webapp/WEB-INF/jsp/login.jsp
+## Snippets
 ```
-<html>
-<head>
-<title>Yahoo!!</title>
-</head>
-<body>
-My First JSP!!!
-</body>
-</html>
-```
-
-Second Snippet - /src/main/resources/application.properties
-```
-spring.mvc.view.prefix: /WEB-INF/jsp/
-spring.mvc.view.suffix: .jsp
-logging.level.: DEBUG
-```
-
-Third Snippet : To enable jsp support in embedded tomcat server!
-```
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-jasper</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
+ModelMap model
+model.put("name", name);
+My First JSP!!! My name is ${name}
 ```
 
 ## Exercises
