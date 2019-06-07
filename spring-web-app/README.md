@@ -102,10 +102,10 @@ Third Snippet : To enable jsp support in embedded tomcat server!
 </project>
 ```
 ---
-### src/main/java/com/in28minutes/springboot/web/controller/LoginController.java
+### src/main/java/org/dev/tech/controller/LoginController.java
 
 ```java
-package com.in28minutes.springboot.web.controller;
+package org.dev.tech.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -121,10 +121,10 @@ public class LoginController {
 }
 ```
 ---
-### src/main/java/com/in28minutes/springboot/web/SpringBootFirstWebApplication.java
+### src/main/java/org/dev/tech/springwebapp/SpringBootFirstWebApplication.java
 
 ```java
-package com.in28minutes.springboot.web;
+package org.dev.tech.springwebapp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -162,10 +162,10 @@ My First JSP!!
 </html>
 ```
 ---
-### src/test/java/com/in28minutes/springboot/web/SpringBootFirstWebApplicationTests.java
+### src/test/java/org/dev/tech/springwebapp/SpringBootFirstWebApplicationTests.java
 
 ```java
-package com.in28minutes.springboot.web;
+package org.dev.tech.springwebapp;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
