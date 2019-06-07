@@ -11,7 +11,7 @@ public class LoginController {
 	//@ResponseBody
 	public String loginMessage() {
 		
-		return "Hello Woorld Using @ComponentScan ";
+		return "login";
 	}
 
 }
