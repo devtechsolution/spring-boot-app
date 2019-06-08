@@ -1,64 +1,165 @@
-## What You Will Learn during this Step:
-- Add validation for userid and password
- - Hard coded validation!!
+## What we will do:
+- Create TodoController and list-todos.jsp
+- Make TodoService a @Service and inject it
 
-## Useful Snippets and References
-First Snippet
+## Pending for Next Step
+- ${name} is not available in list-todos.jsp
+- in28Minutes is hardcoded in TodoController
+
+## Snippets
+
+Snippet -  /src/main/java/com/in28minutes/springboot/web/model/Todo.java
 ```
-    @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public String showLoginPage(ModelMap model, @RequestParam String name) {
-        return "login";
+package com.in28minutes.springboot.web.model;
+
+import java.util.Date;
+
+public class Todo {
+    private int id;
+    private String user;
+    private String desc;
+    private Date targetDate;
+    private boolean isDone;
+
+    public Todo(int id, String user, String desc, Date targetDate,
+            boolean isDone) {
+        super();
+        this.id = id;
+        this.user = user;
+        this.desc = desc;
+        this.targetDate = targetDate;
+        this.isDone = isDone;
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String handleLogin(ModelMap model, @RequestParam String name) {
-        model.put("name", name);
-        return "welcome";
+    public int getId() {
+        return id;
     }
 
-```
-Second Snippet
-```
-<form method="POST">
-        Name : <input name="name" type="text" /> <input type="submit" />
-</form>
-
-```
-
-Third Snippet
-```
-package org.dev.tech.service;
-
-import org.springframework.stereotype.Component;
-
-@Component
-public class LoginService {
-    public boolean validateUser(String user, String password) {
-        return user.equalsIgnoreCase("aditya") && password.equals("srivastva");
+    public void setId(int id) {
+        this.id = id;
     }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public Date getTargetDate() {
+        return targetDate;
+    }
+
+    public void setTargetDate(Date targetDate) {
+        this.targetDate = targetDate;
+    }
+
+    public boolean isDone() {
+        return isDone;
+    }
+
+    public void setDone(boolean isDone) {
+        this.isDone = isDone;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + id;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Todo other = (Todo) obj;
+        if (id != other.id) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Todo [id=%s, user=%s, desc=%s, targetDate=%s, isDone=%s]", id,
+                user, desc, targetDate, isDone);
+    }
+
 }
-
 ```
-Fourth Snippet
+
+Snippet - /src/main/java/com/in28minutes/springboot/web/service/TodoService.java
 ```
-    @Autowired
-    private LoginService service;
+package com.in28minutes.springboot.web.service;
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String handleLogin(ModelMap model, @RequestParam String name,
-            @RequestParam String password) {
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
-        boolean isValidUser = service.validateUser(name, password);
+import org.springframework.stereotype.Service;
 
-        if (isValidUser) {
-            model.put("name", name);
-            return "welcome";
-        } else {
-            model.put("errorMessage", "Invalid Credentials!!");
-            return "login";
+import com.in28minutes.springboot.web.model.Todo;
+
+@Service
+public class TodoService {
+    private static List<Todo> todos = new ArrayList<Todo>();
+    private static int todoCount = 3;
+
+    static {
+        todos.add(new Todo(1, "in28Minutes", "Learn Spring MVC", new Date(),
+                false));
+        todos.add(new Todo(2, "in28Minutes", "Learn Struts", new Date(), false));
+        todos.add(new Todo(3, "in28Minutes", "Learn Hibernate", new Date(),
+                false));
+    }
+
+    public List<Todo> retrieveTodos(String user) {
+        List<Todo> filteredTodos = new ArrayList<Todo>();
+        for (Todo todo : todos) {
+            if (todo.getUser().equals(user)) {
+                filteredTodos.add(todo);
+            }
+        }
+        return filteredTodos;
+    }
+
+    public void addTodo(String name, String desc, Date targetDate,
+            boolean isDone) {
+        todos.add(new Todo(++todoCount, name, desc, targetDate, isDone));
+    }
+
+    public void deleteTodo(int id) {
+        Iterator<Todo> iterator = todos.iterator();
+        while (iterator.hasNext()) {
+            Todo todo = iterator.next();
+            if (todo.getId() == id) {
+                iterator.remove();
+            }
         }
     }
+}
 ```
+
 
 ## Files List
 
@@ -171,6 +272,38 @@ public class LoginController {
 }
 ```
 ---
+### src/main/java/org/dev/tech/controller.TodoController
+
+```java
+package org.dev.tech.controller;
+
+import org.dev.tech.service.LoginService;
+import org.dev.tech.service.TodoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+//@RestController
+@Controller
+public class TodoController {
+
+	@Autowired
+	TodoService  service;
+	
+	@RequestMapping(value="/list-todos", method = RequestMethod.GET)
+	public String showTodoList(ModelMap model){
+		model.put("todos", service.retrieveTodos("devtechsolution"));
+		return "list-todos";
+	}
+	
+}
+
+```
+---
+
 ### src/main/java/org/dev/tech/service/LoginService.java
 
 ```java
@@ -187,6 +320,60 @@ public class LoginService {
 				&& password.equalsIgnoreCase("srivastva");
 	}
 
+}
+```
+---
+
+### src/main/java/org/dev/tech/service/TodoService.java
+
+```
+package org.dev.tech.service;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import org.dev.tech.model.Todo;
+import org.springframework.stereotype.Service;
+
+@Service
+public class TodoService {
+    private static List<Todo> todos = new ArrayList<Todo>();
+    private static int todoCount = 3;
+
+    static {
+        todos.add(new Todo(1, "devtechsolution", "Learn Spring MVC", new Date(),
+                false));
+        todos.add(new Todo(2, "devtechsolution", "Learn Spring boot", new Date(), false));
+        todos.add(new Todo(3, "devtechsolution", "Learn Hibernate", new Date(),
+                false));
+    }
+
+    public List<Todo> retrieveTodos(String user) {
+        List<Todo> filteredTodos = new ArrayList<Todo>();
+        for (Todo todo : todos) {
+            if (todo.getUser().equals(user)) {
+                filteredTodos.add(todo);
+            }
+        }
+        return filteredTodos;
+    }
+
+    public void addTodo(String name, String desc, Date targetDate,
+            boolean isDone) {
+        todos.add(new Todo(++todoCount, name, desc, targetDate, isDone));
+    }
+
+    public void deleteTodo(int id) {
+        Iterator<Todo> iterator = todos.iterator();
+        while (iterator.hasNext()) {
+            Todo todo = iterator.next();
+            if (todo.getId() == id) {
+                iterator.remove();
+            }
+        }
+    }
 }
 ```
 ---
@@ -227,7 +414,7 @@ logging.level.org.springframework.web=DEBUG
 <body>
 	<font color="red">${errorMessage}</font>
 	<form method="post">
-		Name : <input type="text" name="name" />
+		Name : <input type="text" name="name" /> 
 		Password : <input type="password" name="password" /> 
 		<input type="submit" />
 	</form>
@@ -245,13 +432,31 @@ logging.level.org.springframework.web=DEBUG
 <title>First Web Application</title>
 </head>
 
-<body>
-	Welcome ${name}!!
+<body>Welcome ${name}!! <a href="/list-todos">Click Here</a> to manage your todo's
 </body>
 
 </html>
 ```
 ---
+### src/main/webapp/WEB-INF/jsp/list-todos.jsp
+
+```
+<html>
+
+<head>
+<title>First Web Application</title>
+</head>
+
+<body>
+	Here are list of todos:
+	${todos}
+	
+</body>
+
+</html>
+```
+---
+
 ### src/test/java/org/dev/tech/springwebapp/SpringBootFirstWebApplicationTests.java
 
 ```java
